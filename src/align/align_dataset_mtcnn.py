@@ -76,7 +76,7 @@ def main(args):
             for image_path in cls.image_paths:
                 nrof_images_total += 1
                 filename = os.path.splitext(os.path.split(image_path)[1])[0]
-                output_filename = os.path.join(output_class_dir, filename+'.png')
+                output_filename = os.path.join(output_class_dir, filename+'.jpg')
                 print(image_path)
                 if not os.path.exists(output_filename):
                     try:

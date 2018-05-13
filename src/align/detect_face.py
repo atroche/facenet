@@ -277,6 +277,9 @@ def create_mtcnn(sess, model_path):
     if not model_path:
         model_path,_ = os.path.split(os.path.realpath(__file__))
 
+    print("Creating MTCNN")
+    print("model path: %s" % model_path)
+
     with tf.variable_scope('pnet'):
         data = tf.placeholder(tf.float32, (None,None,None,3), 'input')
         pnet = PNet({'data':data})
