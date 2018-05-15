@@ -54,9 +54,9 @@ def main(args):
         with sess.as_default():
             pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
     
-    minsize = 20 # minimum size of face
-    threshold = [ 0.6, 0.7, 0.7 ]  # three steps's threshold
-    factor = 0.709 # scale factor
+    minsize = 20
+    threshold = [ 0.6, 0.7, 0.7 ]
+    factor = 0.709
 
     # Add a random key to the filename to allow alignment using multiple processes
     random_key = np.random.randint(0, high=99999)
@@ -116,10 +116,15 @@ def main(args):
                             for i, det in enumerate(det_arr):
                                 det = np.squeeze(det)
                                 bb = np.zeros(4, dtype=np.int32)
-                                bb[0] = np.maximum(det[0]-args.margin/2, 0)
-                                bb[1] = np.maximum(det[1]-args.margin/2, 0)
-                                bb[2] = np.minimum(det[2]+args.margin/2, img_size[1])
-                                bb[3] = np.minimum(det[3]+args.margin/2, img_size[0])
+                                left_x, top_y, right_x, bottom_y = det
+                                width = right_x - left_x
+                                height = bottom_y - top_y
+                                padding = width * 0.3
+
+                                bb[0] = np.maximum(det[0]-padding, 0)
+                                bb[1] = np.maximum(det[1]-padding, 0)
+                                bb[2] = np.minimum(det[2]+padding, img_size[1])
+                                bb[3] = np.minimum(det[3]+padding, img_size[0])
                                 cropped = img[bb[1]:bb[3],bb[0]:bb[2],:]
                                 scaled = misc.imresize(cropped, (args.image_size, args.image_size), interp='bilinear')
                                 nrof_successfully_aligned += 1
@@ -136,7 +141,28 @@ def main(args):
                             
     print('Total number of images: %d' % nrof_images_total)
     print('Number of successfully aligned images: %d' % nrof_successfully_aligned)
-            
+
+
+# import cv2
+#
+#
+# # DON'T FORGET ABOUT HOW CV2 / SCIPY REPRESENT IMAGES DIFFERENTLY
+# # SCIPY IS RGB, CV2 IS BGR BY DEFAULT
+# def cropped_and_aligned_faces(frame):
+#     with tf.Graph().as_default():
+#         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_memory_fraction)
+#         sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
+#         with sess.as_default():
+#             pnet, rnet, onet = align.detect_face.create_mtcnn(sess, None)
+#
+#     img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#
+#     minsize = 20
+#     threshold = [ 0.6, 0.7, 0.7 ]
+#     factor = 0.709
+#     bounding_boxes, _ = align.detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
+#     return []
+
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()

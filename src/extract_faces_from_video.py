@@ -18,11 +18,19 @@ PADDING = 32
 
 def cropped_face(image: np.ndarray, bounding_box: List[int]) -> np.ndarray:
     x, y, w, h = bounding_box
-    top = max(0, y - PADDING)
-    bottom = y + h + PADDING
-    left = max(0, x - PADDING)
-    right = x + w + PADDING
+    top = max(0, y - h)
+    bottom = y + 2 * h
+    left = max(0, x - w)
+    right = x + 2 * w
     return image[top:bottom, left:right]
+#
+#
+#
+# img_array = cv2.imread("datasets/videos/manual_zuck_screenshot.png")
+# faces = detector.detect_faces(img_array)
+# cv2.imwrite("datasets/videos/uncropped_face.jpg", img_array)
+# cv2.imwrite("datasets/videos/cropped_face.jpg", cropped_face(img_array, faces[0]['box']))
+
 
 
 videos_dir = "datasets/videos/"
@@ -30,7 +38,7 @@ filename = "how_to_build_the_future.mkv"
 
 video_path = videos_dir + filename
 filename_w_o_extension = filename[:-4]
-faces_dir = "datasets/videos/faces/%s/" % filename_w_o_extension
+faces_dir = "datasets/videos/faces/%s_better_crop/MZ/" % filename_w_o_extension
 os.makedirs(faces_dir, exist_ok=True)
 
 capture = cv2.VideoCapture(video_path)
